@@ -86,3 +86,22 @@ const seedDatabase = async () => {
 };
 
 module.exports = { seedDatabase };
+
+// Allow direct standalone execution via `npm run seed` or `node src/utils/seed.js`
+if (require.main === module) {
+  const { connectDB, disconnectDB } = require('../config/db');
+
+  (async () => {
+    try {
+      console.log('🚀 Running standalone database seeder...');
+      await connectDB();
+      await seedDatabase();
+      await disconnectDB();
+      console.log('✅ Database seeding finished successfully.');
+      process.exit(0);
+    } catch (error) {
+      console.error('❌ Database seeding failed:', error.message);
+      process.exit(1);
+    }
+  })();
+}

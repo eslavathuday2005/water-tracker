@@ -17,12 +17,19 @@ const logIntake = async (req, res, next) => {
   try {
     const { amount, unit, note, date } = req.body;
 
-    // Edge Case: Amount must be greater than 0 (reject 0 or negative values)
+    // Edge Case: Amount must be greater than 0 (reject 0 or negative values) and at most 10,000ml
     const parsedAmount = Number(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       return res.status(400).json({
         success: false,
         message: 'Invalid intake amount. Amount must be a positive number greater than 0.'
+      });
+    }
+
+    if (parsedAmount > 10000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Intake amount exceeds maximum limit of 10,000ml per entry.'
       });
     }
 

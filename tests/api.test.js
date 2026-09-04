@@ -54,12 +54,14 @@ beforeAll(async () => {
     dailyGoal: 2000
   });
   otherUserToken = otherUser.getSignedJwtToken();
-});
+}, 90000);
 
 afterAll(async () => {
   await mongoose.disconnect();
-  await mongoServer.stop();
-});
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
+}, 30000);
 
 describe('1. Health Check API', () => {
   it('GET /api/health should return 200 and healthy status', async () => {
@@ -175,6 +177,13 @@ describe('3. Water Intake Logging & Edge Cases', () => {
       .send({ amount: -500 });
 
     expect(resNeg.status).toBe(400);
+
+    const resOver = await request(app)
+      .post('/api/intake')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ amount: 15000 });
+
+    expect(resOver.status).toBe(400);
   });
 
   it('GET /api/intake/today should return today total vs daily goal', async () => {

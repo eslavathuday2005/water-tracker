@@ -22,8 +22,8 @@ router.post(
     body('amount')
       .notEmpty()
       .withMessage('Intake amount is required')
-      .isFloat({ min: 1 })
-      .withMessage('Intake amount must be a positive number greater than 0'),
+      .isFloat({ min: 1, max: 10000 })
+      .withMessage('Intake amount must be a positive number between 1 and 10,000ml'),
     body('unit')
       .optional()
       .isIn(['ml', 'glasses', 'oz'])
