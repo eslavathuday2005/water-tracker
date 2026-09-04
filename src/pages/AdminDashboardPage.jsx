@@ -70,7 +70,8 @@ const AdminDashboardPage = () => {
     setSelectedUserForHistory(targetUser);
     try {
       setLoadingUserHistory(true);
-      const res = await intakeApi.getUserHistoryAdmin(targetUser.id);
+      const targetUserId = targetUser.id || targetUser._id;
+      const res = await intakeApi.getUserHistoryAdmin(targetUserId);
       if (res.success) {
         setUserHistoryModalData(res.data);
       }
@@ -83,8 +84,11 @@ const AdminDashboardPage = () => {
 
   // Delete user account
   const handleDeleteUser = async (targetUser) => {
+    const targetUserId = targetUser.id || targetUser._id;
+    const adminId = currentAdmin?.id || currentAdmin?._id;
+
     // Edge Case: Admin tries to delete their own account
-    if (targetUser.id === currentAdmin.id) {
+    if (targetUserId === adminId) {
       showToast('Forbidden: Admin cannot delete their own account!', 'error');
       return;
     }
@@ -94,7 +98,7 @@ const AdminDashboardPage = () => {
     }
 
     try {
-      const res = await userApi.deleteUser(targetUser.id);
+      const res = await userApi.deleteUser(targetUserId);
       if (res.success) {
         showToast(`User ${targetUser.email} was removed successfully.`, 'info');
         loadAdminData();
@@ -287,7 +291,7 @@ const AdminDashboardPage = () => {
               <tbody>
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((u) => {
-                    const isSelf = u.id === currentAdmin.id;
+                    const isSelf = (u.id || u._id) === (currentAdmin?.id || currentAdmin?._id);
                     const joinDate = new Date(u.createdAt).toLocaleDateString([], {
                       month: 'short',
                       day: 'numeric',
@@ -295,7 +299,7 @@ const AdminDashboardPage = () => {
                     });
 
                     return (
-                      <tr key={u.id}>
+                      <tr key={u.id || u._id}>
                         <td>
                           <div>
                             <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>

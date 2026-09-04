@@ -14,6 +14,17 @@ import Navbar from '../components/Navbar';
 import { intakeApi } from '../api/intakeApi';
 import { useToast } from '../context/ToastContext';
 
+// Helper to parse 'YYYY-MM-DD' into a local Date object without UTC midnight offset shifts
+const parseLocalDate = (dateStr) => {
+  if (!dateStr || typeof dateStr !== 'string') return new Date();
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const [year, month, day] = parts.map(Number);
+    return new Date(year, month - 1, day);
+  }
+  return new Date(dateStr);
+};
+
 const HistoryPage = () => {
   const { showToast } = useToast();
   const [historyData, setHistoryData] = useState({ dailyTotals: [], logs: [] });
@@ -145,7 +156,7 @@ const HistoryPage = () => {
                   const maxDisplay = Math.max(3000, day.dailyGoal * 1.2);
                   const barHeightPercent = Math.min(100, Math.round((day.totalAmount / maxDisplay) * 100));
                   const isAchieved = day.totalAmount >= day.dailyGoal;
-                  const dayLabel = new Date(day.date).toLocaleDateString([], { month: 'short', day: 'numeric' });
+                  const dayLabel = parseLocalDate(day.date).toLocaleDateString([], { month: 'short', day: 'numeric' });
 
                   return (
                     <div
@@ -217,7 +228,7 @@ const HistoryPage = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {historyData.dailyTotals.map((day) => {
                 const isExpanded = expandedDate === day.date;
-                const formattedDate = new Date(day.date).toLocaleDateString('en-US', {
+                const formattedDate = parseLocalDate(day.date).toLocaleDateString('en-US', {
                   weekday: 'short',
                   month: 'short',
                   day: 'numeric',

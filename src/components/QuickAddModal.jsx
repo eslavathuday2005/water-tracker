@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
-import { X, Plus, Droplets, Coffee, Wine, Milk, Sparkles } from 'lucide-react';
+import { X, Plus, Droplets, Coffee, Milk, Sparkles, Calendar } from 'lucide-react';
 import { intakeApi } from '../api/intakeApi';
 import { useToast } from '../context/ToastContext';
+
+// Helper to format local date as YYYY-MM-DD
+const getLocalTodayDate = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 const QuickAddModal = ({ isOpen, onClose, onIntakeLogged }) => {
   const { showToast } = useToast();
   const [customAmount, setCustomAmount] = useState('');
   const [note, setNote] = useState('');
+  const [selectedDate, setSelectedDate] = useState(getLocalTodayDate);
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
@@ -21,9 +31,14 @@ const QuickAddModal = ({ isOpen, onClose, onIntakeLogged }) => {
   const handleLogAmount = async (amountToLog, logNote = '') => {
     const num = Number(amountToLog);
 
-    // Edge Case: validate amount > 0
+    // Edge Case: validate amount > 0 and <= 10000ml
     if (isNaN(num) || num <= 0) {
       showToast('Intake amount must be a positive number greater than 0', 'error');
+      return;
+    }
+
+    if (num > 10000) {
+      showToast('Intake amount cannot exceed 10,000ml (10 Litres)', 'error');
       return;
     }
 
@@ -32,6 +47,7 @@ const QuickAddModal = ({ isOpen, onClose, onIntakeLogged }) => {
       const res = await intakeApi.logIntake({
         amount: num,
         unit: 'ml',
+        date: selectedDate || getLocalTodayDate(),
         note: logNote
       });
 
@@ -39,6 +55,7 @@ const QuickAddModal = ({ isOpen, onClose, onIntakeLogged }) => {
         showToast(`Logged +${num}ml of water! Keep hydrating! 💧`, 'success');
         setCustomAmount('');
         setNote('');
+        setSelectedDate(getLocalTodayDate());
         onIntakeLogged(res.data);
         onClose();
       }
@@ -173,6 +190,18 @@ const QuickAddModal = ({ isOpen, onClose, onIntakeLogged }) => {
                 className="form-input"
                 value={customAmount}
                 onChange={(e) => setCustomAmount(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Date</label>
+              <input
+                type="date"
+                className="form-input"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                max={getLocalTodayDate()}
                 disabled={loading}
               />
             </div>

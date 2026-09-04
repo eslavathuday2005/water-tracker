@@ -35,9 +35,12 @@ const SetGoalModal = ({ isOpen, onClose, targetUser, onGoalUpdated }) => {
     try {
       setLoading(true);
 
+      const targetUserId = targetUser?.id || targetUser?._id;
+      const currentUserId = currentUser?.id || currentUser?._id;
+
       // If targetUser is passed and is different from logged in user (Admin editing user)
-      if (targetUser && targetUser.id !== currentUser.id) {
-        const res = await userApi.updateUserGoal(targetUser.id, num);
+      if (targetUser && targetUserId !== currentUserId) {
+        const res = await userApi.updateUserGoal(targetUserId, num);
         if (res.success) {
           showToast(`Updated daily goal to ${num}ml for ${targetUser.name}`, 'success');
           if (onGoalUpdated) onGoalUpdated(res.data);

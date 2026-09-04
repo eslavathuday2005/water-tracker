@@ -15,10 +15,11 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('hydrotrack_token') || null);
   const [loading, setLoading] = useState(true);
 
-  // Sync / verify user session on initial load
+  // Sync / verify user session on initial load once
   useEffect(() => {
     const verifyAuth = async () => {
-      if (token) {
+      const savedToken = localStorage.getItem('hydrotrack_token');
+      if (savedToken) {
         try {
           const res = await authApi.getMe();
           if (res.success && res.data) {
@@ -34,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     verifyAuth();
-  }, [token]);
+  }, []);
 
   const login = async (email, password) => {
     const res = await authApi.login({ email, password });

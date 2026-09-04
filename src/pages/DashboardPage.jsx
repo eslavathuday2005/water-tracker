@@ -19,6 +19,15 @@ import { intakeApi } from '../api/intakeApi';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
+// Helper to format local date as YYYY-MM-DD
+const getLocalTodayDate = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const DashboardPage = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -174,7 +183,12 @@ const DashboardPage = () => {
                     key={amt}
                     onClick={async () => {
                       try {
-                        await intakeApi.logIntake({ amount: amt, unit: 'ml', note: 'Quick shortcut' });
+                        await intakeApi.logIntake({
+                          amount: amt,
+                          unit: 'ml',
+                          date: getLocalTodayDate(),
+                          note: 'Quick shortcut'
+                        });
                         showToast(`+${amt}ml added! 💧`, 'success');
                         fetchTodayData();
                       } catch (err) {
