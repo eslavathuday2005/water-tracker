@@ -1,0 +1,19 @@
+{
+  "name": "water-intake-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-ready Water Intake & Hydration Tracker with JWT Auth, RBAC Admin Portal, and Interactive Gauge Visualizations",
+  "scripts": {
+    "dev": "concurrently -n \"API,WEB\" -c \"cyan.bold,magenta.bold\" \"npm --prefix water-tracker-backend run dev\" \"npm --prefix water-tracker-frontend run dev\"",
+    "dev:backend": "npm --prefix water-tracker-backend run dev",
+    "dev:frontend": "npm --prefix water-tracker-frontend run dev",
+    "start:backend": "npm --prefix water-tracker-backend start",
+    "seed": "npm --prefix water-tracker-backend run seed",
+    "test": "npm --prefix water-tracker-backend test",
+    "build": "npm --prefix water-tracker-frontend run build",
+    "install:all": "npm --prefix water-tracker-backend install && npm --prefix water-tracker-frontend install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

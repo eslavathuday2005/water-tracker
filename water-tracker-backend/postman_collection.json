@@ -1,0 +1,229 @@
+{
+  "info": {
+    "_postman_id": "water-tracker-api-collection",
+    "name": "Water Intake Tracker API",
+    "description": "Postman / Thunder Client collection for testing the Water Intake Tracker RESTful API with JWT Authentication and Role-Based Access Control.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "System Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"Password@123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Login as User",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@watertracker.com\",\n  \"password\": \"User@12345\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Login as Admin",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@watertracker.com\",\n  \"password\": \"Admin@12345\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Get Current User (Me)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/auth/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "me"]
+        }
+      }
+    },
+    {
+      "name": "Intake - Log Water (250ml)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 250,\n  \"unit\": \"ml\",\n  \"note\": \"Glass of water\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/intake",
+          "host": ["{{baseUrl}}"],
+          "path": ["intake"]
+        }
+      }
+    },
+    {
+      "name": "Intake - Edge Case: Reject 0 or Negative Amount",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{userToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": -100,\n  \"unit\": \"ml\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/intake",
+          "host": ["{{baseUrl}}"],
+          "path": ["intake"]
+        }
+      }
+    },
+    {
+      "name": "Intake - Get Today Summary",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/intake/today",
+          "host": ["{{baseUrl}}"],
+          "path": ["intake", "today"]
+        }
+      }
+    },
+    {
+      "name": "Intake - Get Intake History",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/intake/history?days=14",
+          "host": ["{{baseUrl}}"],
+          "path": ["intake", "history"],
+          "query": [{ "key": "days", "value": "14" }]
+        }
+      }
+    },
+    {
+      "name": "Admin - Get All Users",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/users",
+          "host": ["{{baseUrl}}"],
+          "path": ["users"]
+        }
+      }
+    },
+    {
+      "name": "Admin - Edge Case: Normal User Access Blocked (403)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/users",
+          "host": ["{{baseUrl}}"],
+          "path": ["users"]
+        }
+      }
+    },
+    {
+      "name": "Admin - View User Intake History",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/intake/user/:userId",
+          "host": ["{{baseUrl}}"],
+          "path": ["intake", "user", ":userId"]
+        }
+      }
+    },
+    {
+      "name": "Admin - Update User Daily Goal",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dailyGoal\": 2500\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/goal",
+          "host": ["{{baseUrl}}"],
+          "path": ["users", ":userId", "goal"]
+        }
+      }
+    },
+    {
+      "name": "Admin - Overview Stats",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/stats/overview",
+          "host": ["{{baseUrl}}"],
+          "path": ["stats", "overview"]
+        }
+      }
+    }
+  ]
+}
